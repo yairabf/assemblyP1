@@ -13,7 +13,7 @@ invalidEvent: .string "invalid option!\n"
 .globl pstrlen
   .type  pstrlen, @function
 pstrlen:
-  movzbq    (%rdi), %rax       # the return value will be the value that is at the first byte of the start of the pstring
+  movzbq    (%rdi), %rax     # the return value will be the value that is at the first byte of the start of the pstring
   ret
 
 .globl replaceChar
@@ -21,34 +21,34 @@ pstrlen:
   # the function receives two char, old and new and iterate the pString and replace every appearance #
   # of the old char by the new char #
   replaceChar:
-  pushq   %r12                    # we're backuping r12 for saving him and usign it later
-  pushq   %r13                    # we're backuping r13 for saving him and usign it later
-  pushq   %r14                    # we're backuping r14 for saving him and usign it later
-  pushq   %r15                    # we're backuping r15 for saving him and usign it later
-  movq    %rdi, %r12              # storing the address of pString into r12
-  movb    (%r12), %r13b           # sotring into r13b the size of the string so we can iterate it
-  addq    $1, %r12                # point to the first char of the string
-  movb    %sil, %r14b             # store the old char into r14b
-  movb    %dl, %r15b              # store the new char into r15b
+  pushq   %r12               # we're backuping r12 for saving him and usign it later
+  pushq   %r13               # we're backuping r13 for saving him and usign it later
+  pushq   %r14               # we're backuping r14 for saving him and usign it later
+  pushq   %r15               # we're backuping r15 for saving him and usign it later
+  movq    %rdi, %r12         # storing the address of pString into r12
+  movb    (%r12), %r13b      # sotring into r13b the size of the string so we can iterate it
+  addq    $1, %r12           # point to the first char of the string
+  movb    %sil, %r14b        # store the old char into r14b
+  movb    %dl, %r15b         # store the new char into r15b
 
-  .iterateToNextCahr:             # in this lable we do the checks we need for each iteration
-  subq    $1, %r14                # update the counter by decreasing it
-  cmpb    %r14b, (%r12)           # check if the chars are equales
-  je      .switchChars            # if the cahrs are equales, we do the swich
-  cmpq    $0, %r13                # if the arn't equals we check if we got to the end of the loop
-  jle     .doneIterating          # if we at the end of loop, we go and return from the function
-  incq    %r12                    # if current char of string .globl replaceChar
+  .iterateToNextCahr:        # in this lable we do the checks we need for each iteration
+  subq    $1, %r14           # update the counter by decreasing it
+  cmpb    %r14b, (%r12)      # check if the chars are equales
+  je      .switchChars       # if the cahrs are equales, we do the swich
+  cmpq    $0, %r13           # if the arn't equals we check if we got to the end of the loop
+  jle     .doneIterating     # if we at the end of loop, we go and return from the function
+  incq    %r12               # if current char of string .globl replaceChar
 
-  .switchCahrs:                   # in this lable we do the swich
-  movb    %r15b, (%r12)           # replacing the current char by the new char
-  incq    %r12                    # we point to the next char of the string for the next check
-  jmp     .iterateToNextCahr      # iterate the next char
+  .switchCahrs:              # in this lable we do the swich
+  movb    %r15b, (%r12)      # replacing the current char by the new char
+  incq    %r12               # we point to the next char of the string for the next check
+  jmp     .iterateToNextCahr # iterate the next char
 
   .doneIterating:
-  popq   %r15                     # pop r12 to clean the stack
-  popq   %r14                     # pop r12 to clean the stack
-  popq   %r13                     # pop r12 to clean the stack
-  popq   %r12                     # pop r12 to clean the stack
+  popq   %r15                # pop r12 to clean the stack
+  popq   %r14                # pop r12 to clean the stack
+  popq   %r13                # pop r12 to clean the stack
+  popq   %r12                # pop r12 to clean the stack
   ret
 
   # The function receives two indexes and and create new sub string that start
@@ -56,53 +56,53 @@ pstrlen:
 .globl pstrijcpy
   .type  pstrijcpy, @function
 pstrijcpy:
-   pushq  %r12	                  # we're backuping r12 for saving him and usign it late
-   pushq  %r13		                # we're backuping r13 for saving him and usign it late
-   movq   %rdi, %r12		          # for restore to rdi
-   addq   $1, %rdi                # now rdi point on the string of pstring1
-   addq   %rdx, %rdi              # rdi now point at the start place to swap char
-   addq   $1, %rsi                # now rdi point on the string of pstring2
-   addq   %rdx, %rsi              # rsi now point at the start place to swap char
+  pushq  %r12	               # we're backuping r12 for saving him and usign it late
+  pushq  %r13		             # we're backuping r13 for saving him and usign it late
+  movq   %rdi, %r12		       # we backup the destanation pString so we can resotre it later
+  addq   $1, %rdi            # set rdi to point the strat of the destanation string
+  addq   %rdx, %rdi          # change rdi to points on the start index
+  addq   $1, %rsi            # set rsi to point the strat of the source string
+  addq   %rdx, %rsi          # change rsi to points on the start index
 
-  # check if valid:
-  movzbq  (%r12), %r8			        # the pstr1 length in r8
-  movzbq  (%r13), %r9			        # the pstr2 length in r9
+  # check if the start and the end indexes are valid and in the size of the string length
+  movzbq  (%r12), %r9		     # store the length of the destanation string in r8
+  movzbq  (%r13), %r10	     # store the length of rhe source string in r9
 
-  cmpq    %rdx, %r8               # i>pstr1 length
-  jl      .invalidInput
-  cmpq    %rcx, %r8               # j>pstr1 length
-  jl      .invalidInput
-  cmpq    %rdx, %r9               # i>pstr2 length
-  jl      .invalidInput
-  cmpq    %rcx, %r9               # j>pstr2 length
-  jl      .invalidInput
+  cmpq    %rdx, %r9          # if the start index bigger than destanation length
+  jl      .invalidInput      # print error massage
+  cmpq    %rcx, %r9          # if the end index bigger than destanation length
+  jl      .invalidInput      # print error massage
+  cmpq    %rdx, %r10         # if the start index bigger than source length
+  jl      .invalidInput      # print error massage
+  cmpq    %rcx, %r10         # if the end index bigger than source length
+  jl      .invalidInput      # print error massage
 
-.startLoop:
-   cmpb   %dl, %cl                # j => i go to change char else goto end case
-   jge    .changeNextChar
-   jmp    .end                    # if we end to change the right indexes end func
+.copyLoop:
+   cmpb   %dl, %cl           # while start index lesser than the end index
+   jge    .copyChar          # copy the current char from source to destanation
+   jmp    .end               # if we finished copy the strings
 
-.changeNextChar:
-   movb   (%rsi), %r8b            # get the byte into cl->rcx
-   movb   %r8b, (%rdi)            # put cl into the current byte of rdi
-   addq   $1, %rdx                # i++
-   addq   $1, %rdi                # get to next char
-   addq   $1, %rsi                # get to next char
-   jmp    .startLoop              # and go again to start of the loop
+.copyChar:
+   movb   (%rsi), %r8b       # store the currnet pointed char of the source string in r8b
+   movb   %r8b, (%rdi)       # copy it to the currnet location of the destanation string
+   addq   $1, %rdx           # increase the start index by 1
+   addq   $1, %rdi           # move to the next char in the destanation string
+   addq   $1, %rsi           # move to the next char in the source string
+   jmp    .copyLoop          # continue the copy loop
 
 .invalidInput:
-  movq    $invalid, %rdi          # print the error
-  movq    $0, %rax
-  call    printf
-  popq    %r13
-  popq    %r12
+  movq    $invalid, %rdi     # store the error massage in rdi
+  movq    $0, %rax           # set rax to 0
+  call    printf             # call printf
+  popq    %r13               # pop r13 to claen the stack
+  popq    %r12               # pop r12 to claen the stack
   ret
 
 .end:
-   movq   %r12, %rdi		          # for convience
-   movq   %rdi, %rax              # return value dst
-   popq   %r13
-   popq   %r12
+   movq   %r12, %rdi		     # store the modified string into rdi
+   movq   %rdi, %rax         # return the modified string
+   popq   %r13               # pop r13 to claen the stack
+   popq   %r12               # pop r12 to claen the stack
    ret
 
 .globl swapCase
