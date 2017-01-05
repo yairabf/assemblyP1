@@ -206,12 +206,12 @@ pstrijcmp:
   movq    $0, %rax           # set rax to 0
   call    printf             # call printf
   movq    $-2, %rax          # in that case return value -2
-  popq    %r13
-  popq    %r12
+  popq    %r13               # pop r13 to claen the stack
+  popq    %r12               # pop r12 to claen the stack
   ret
 
 .endFunc54:
-  movq    $0, %rax                # same same-> value return 0
-  popq    %r13
-  popq    %r12
+  movq    $0, %rax           # if the strings are equal we return 0
+  popq    %r13               # pop r13 to claen the stack
+  popq    %r12               # pop r12 to claen the stack
   ret
