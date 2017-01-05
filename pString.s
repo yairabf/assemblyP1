@@ -3,8 +3,8 @@
 .section .rodata
 
 #case51
-old: .string "%c"
-new: .string "%c"
+old: .string "%c\n"
+new: .string "%c\n"
 invalidInput: .string "invalid input!\n"
 #defaultcase
 invalidEvent: .string "invalid option!\n"
@@ -138,7 +138,7 @@ swapCase:
   movb    %dl, (%rdi)        # srotre the changed char back into the string
   jmp     .iterateToNext     # iterate next
 
-  .LowerToUpper:
+.LowerToUpper:
   movsbq  (%rdi), %rdx       # store the currnet char in rdx
   subb    $32, %dl           # switch the char in the first byte to upper case
   movb    %dl, (%rdi)        # srotre the changed char back into the string
@@ -152,8 +152,8 @@ swapCase:
 .globl pstrijcmp
   .type  pstrijcmp, @function
 pstrijcmp:
-  pushq   %r12               # we're backuping r12 for saving him and usign it late
-  pushq   %r13               # we're backuping r13 for saving him and usign it late
+  pushq   %r12               # we're backuping r12 for saving him and usign it later
+  pushq   %r13               # we're backuping r13 for saving him and usign it later
   movzbq  (%rdi), %r12       # sotre the length of the first string in r12
   movzbq  (%rsi), %r13       # store the length of the second string in r13
   addq    $1, %rdi           # points to the start of the string of pstr1
