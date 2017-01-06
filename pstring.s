@@ -2,9 +2,6 @@
 # i received help from ariel cohen and chaim rubinstien #
 .section .rodata
 
-#case51
-old: .string "%c\n"
-new: .string "%c\n"
 invalidInput: .string "invalid input!\n"
 #defaultcase
 invalidEvent: .string "invalid option!\n"
@@ -20,31 +17,31 @@ pstrlen:
   .type  replaceChar, @function
   # the function receives two char, old and new and iterate the pString and replace every appearance #
   # of the old char by the new char #
-  replaceChar:
+replaceChar:
   pushq   %r12               # we're backuping r12 for saving him and usign it later
   pushq   %r13               # we're backuping r13 for saving him and usign it later
   pushq   %r14               # we're backuping r14 for saving him and usign it later
   pushq   %r15               # we're backuping r15 for saving him and usign it later
   movq    %rdi, %r12         # storing the address of pString into r12
-  movb    (%r12), %r13b      # sotring into r13b the size of the string so we can iterate it
+  movzbq    (%r12), %r13      # sotring into r13b the size of the string so we can iterate it
   addq    $1, %r12           # point to the first char of the string
-  movb    %sil, %r14b        # store the old char into r14b
-  movb    %dl, %r15b         # store the new char into r15b
+  movzbq    %sil, %r14        # store the old char into r14b
+  movzbq    %dl, %r15         # store the new char into r15b
 
-  .iterateToNextCahr:        # in this lable we do the checks we need for each iteration
-  subq    $1, %r14           # update the counter by decreasing it
+.iterateToNextCahr:          # in this lable we do the checks we need for each iteration
   cmpb    %r14b, (%r12)      # check if the chars are equales
   je      .switchChars       # if the cahrs are equales, we do the swich
   cmpq    $0, %r13           # if the arn't equals we check if we got to the end of the loop
   jle     .doneIterating     # if we at the end of loop, we go and return from the function
+  subq    $1, %r13           # update the counter by decreasing it
   incq    %r12               # if current char of string .globl replaceChar
-
-  .switchCahrs:              # in this lable we do the swich
+  jmp     .iterateToNextCahr # check the next char
+.switchChars:                # in this lable we do the swich
   movb    %r15b, (%r12)      # replacing the current char by the new char
   incq    %r12               # we point to the next char of the string for the next check
   jmp     .iterateToNextCahr # iterate the next char
 
-  .doneIterating:
+.doneIterating:
   popq   %r15                # pop r12 to clean the stack
   popq   %r14                # pop r12 to clean the stack
   popq   %r13                # pop r12 to clean the stack
@@ -90,7 +87,7 @@ pstrijcpy:
   jmp    .copyLoop           # continue the copy loop
 
 .invalidInput:
-  movq    $invalid, %rdi     # store the error massage in rdi
+  movq    $invalidInput, %rdi     # store the error massage in rdi
   movq    $0, %rax           # set rax to 0
   call    printf             # call printf
   popq    %r13               # pop r13 to claen the stack
@@ -109,7 +106,7 @@ pstrijcpy:
 .globl swapCase
   .type  swapCase, @function
 swapCase:
-   movzbq     (%rdi), %r8    # store the length of the string in r8
+   movzbq   (%rdi), %r8      # store the length of the string in r8
 .iterateToNext:
    subq     $1, %r8          # decreasing the counter of the iteration
    addq     $1, %rdi         # change rdi to points the next char
@@ -132,7 +129,7 @@ swapCase:
   jb      .iterateToNext     # if the ascii value is between 90-97 we don't swap
   jmp     .LowerToUpper      # swithc from lowercase to uppercase
 
-.UppperToLower:
+.UpperToLower:
   movsbq  (%rdi), %rdx       # store the currnet char in rdx
   addb    $32, %dl           # switch the char in the first byte to lower case
   movb    %dl, (%rdi)        # srotre the changed char back into the string
@@ -202,7 +199,7 @@ pstrijcmp:
   ret
 
 .invalidindex:
-  movq    $invalid, %rdi     # store the error massage in rdi
+  movq    $invalidInput, %rdi     # store the error massage in rdi
   movq    $0, %rax           # set rax to 0
   call    printf             # call printf
   movq    $-2, %rax          # in that case return value -2

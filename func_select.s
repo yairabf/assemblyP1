@@ -8,13 +8,11 @@
   .quad .opp53
   .quad .opp54
   .quad .oppdef
-
 # case50 - print the pStrings lengths #
-outputstring:  .string "%s"
-opp50outPut:   .string "first pstring length: %d, second pstring length: %d"
+opp50outPut:   .string "first pstring length: %d, second pstring length: %d\n"
 
 # case51 - replacing old char by new onwe #
-char:           string "%c"
+char:          .string "\n%c"
 opp51outPut:   .string "old char: %c, new char: %c, first string: %s, second string: %s\n"
 
 # case52 - copy sub string of the pString #
@@ -47,14 +45,14 @@ run_func:
   movq    %rsi, %rdi           # store the first pstring to rdi
   movq    $0, %rax             # set rax to 0
   call    pstrlen              # call pstrlen function
-  movq    %rax, %r12           # store the length of the second string into r12
+  movq    %rax, %r8           # store the length of the second string into r12
   movq    %rdx, %rdi           # store the second pstring to rdi
   movq    $0, %rax             # set rax to 0
   call    pstrlen              # call pstrlen function
-  movq    %rax, %r13           # store the length of the second string into r13
+  movq    %rax, %r9           # store the length of the second string into r13
   movq    $opp50outPut, %rdi   # store opp50 format into rdi
-  movq    %r8, %rsi            # first length into rsi
-  movq    %r9, %rdx            # second length into rdx
+  movq    %r8, %rsi           # first length into rsi
+  movq    %r9, %rdx           # second length into rdx
   movq    $0, %rax             # set rax to 0
   call    printf               # print the lengths of the two pstrings
   ret
@@ -67,21 +65,21 @@ run_func:
   movq    %rsi, %r12           # backup the first pstring in r12
   movq    %rdx, %r13           # backup the second pstring in r13
 
-# sacn the old cahr that we wnat to replace #
-  subq    $1, %rsp             # increase the stack space by 1 fot the first char
+# scan the old char that we wnat to replace #
+  subq    $2, %rsp             # increase the stack space by 1 fot the first char
   movq    %rsp, %rsi           # store the location of the stack into rsi
   movq    $char, %rdi          # store the %c into rdi
   movq    $0, %rax             # set rax to 0
-  call    scanf                # get dummy \n
-  movb   (%rsp), %r14b         # convert the char into 8 bits place
+  call    scanf                # store the old char
+  movb    (%rsp), %r14b        # convert the char into 8 bits place
 
-# sacn the new cahr that we wnat to replace #
-  subq    $1, %rsp             # increase the stack space by 1 for the second char
+# scan the new char that we wnat to replace #
+  subq    $2, %rsp             # increase the stack space by 1 for the second char
   movq    %rsp, %rsi           # store the location of the stack into rsi
-  movq    $char, %rdi          # store the %c into rdi
+  movq    $char, %rdi       # store the %c into rdi
   movq    $0, %rax             # set rax to 0
   call    scanf                # call scanf and receives the char
-  movb    (%rsp), %r15b        # convert the char into 8 bits place
+  movzbq  (%rsp), %r15        # convert the char into 8 bits place
 
 # sending the two pStrings and the two chars to replaceChar function #
 # sending the first pString #
@@ -108,7 +106,7 @@ run_func:
   movq    %r13, %r8            # string2 into the 5 parameter
   call    printf
 
-  #  addq    $4, %rsp             #
+  addq    $4, %rsp             # claen the stack
   popq    %r15                 # pop r15 for cleaning the stack
   popq    %r14                 # pop r14 for cleaning the stack
   popq    %r13                 # pop r13 for cleaning the stack
@@ -126,7 +124,8 @@ run_func:
   subq    $4, %rsp             # increase the stack space for the strat index
   movq    %rsp, %rsi           # store the address of the current stack location in rsi
   movq    $startIndex, %rdi    # store the %d in rdi
-  movq    $0, %rax
+  movq    $0, %rax              
+
   call    scanf                # call scanf to receives the first index
   movzbq  (%rsp), %r14         # convert and store the index in form of 1 byte of in r14b
   addq    $4, %rsp             # rsp back to his place
@@ -143,13 +142,13 @@ run_func:
   movzbq  %r15b, %rcx          # we put only the last byte into cl->rcx
   movq    $0, %rax
   call    pstrijcpy
-  movq    $format52, %rdi      # format into rdi
+  movq    $opp52outPut, %rdi   # format into rdi
   movzbq  (%r12), %rsi         # the length into rsi
   addq    $1, %r12             # point onlt to the string
   movq    %r12, %rdx           # get the string into parameter for printf
   movq    $0, %rax
   call    printf
-  movq    $format52, %rdi      # format into rdi
+  movq    $opp52outPut, %rdi   # format into rdi
   movzbq  (%r13), %rsi         # the length into rsi
   addq    $1, %r13             # point onlt to the string
   movq    %r13, %rdx           # get the string into parameter for printf
@@ -160,7 +159,7 @@ run_func:
   popq    %r13                 # pop r13 for cleaning the stack
   popq    %r12                 # pop r12 for cleaning the stack
 
-.case53:
+.opp53:
   pushq   %r12                 # we need to backup r12 for saving him
   pushq   %r13                 # we need to backup r13 for saving him
   movq    %rsi, %r12           # save the first pstring
@@ -169,30 +168,32 @@ run_func:
   movq    $0, %rax
   call    swapCase
   movq    %r13, %rdi           # put the second pstring as the first parameter of the function
-  movq    $0, %rax
+  movq    $0, %rax             # set rax to 0
   call    swapCase
-  movq    $format53, %rdi      # format into rdi
+  movq    $opp53outPut, %rdi   # format into rdi
   movzbq  (%r12), %rsi         # the length into rsi
   addq    $1, %r12             # point only to the string
   movq    %r12, %rdx           # get the string into parameter for printf
   movq    $0, %rax
   call    printf
-  movq    $format53, %rdi      # format into rsi
+  movq    $opp53outPut, %rdi   # format into rsi
   movzbq  (%r13), %rsi         # the length into rsi
   addq    $1, %r13             # point only to the string
-  movq    %r13, %rdx           # get the string into parameter for printf
-  movq    $0, %rax
-  call    printf
-  popq    %r13                 # we need to backup r12 for saving him
-  popq    %r12                 # we need to backup r13 for saving him
+  movq    %r13, %rdx           # sotre the string into parameter for printf
+  movq    $0, %rax             # set rax to 0
+  call    printf               # call printf
+  popq    %r13                 # pop r13 for cleaning the stack
+  popq    %r12                 # pop r12 for cleaning the stack
   ret
-.case54:
-  pushq   %r12                 # we need to backup r12 for saving him
-  pushq   %r13                 # we need to backup r13 for saving him
-  pushq   %r14                 # we need to backup r14 for saving him
-  pushq   %r15                 # we need to backup r15 for saving him
+
+.opp54:
+  pushq   %r12                 # backuping r12 for saving him and usign it later
+  pushq   %r13                 # backuping r13 for saving him and usign it later
+  pushq   %r14                 # backuping r14 for saving him and usign it later
+  pushq   %r15                 # backuping r15 for saving him and usign it later
   movq    %rsi, %r12           # save the first pstring
   movq    %rdx, %r13           # save the second pstring
+# scan the first index #
   subq    $4, %rsp             # get place for the int
   movq    %rsp, %rsi           # rsi will get the address of rsp
   movq    $startIndex, %rdi    # get the format into rdi
@@ -200,29 +201,32 @@ run_func:
   call    scanf                # call scanf with format and place for int
   movzbq  (%rsp), %r14         # put only the first byte of the int in r14b
   addq    $4, %rsp             # rsp back to his place
-  subq    $4, %rsp             # get place for the second int
-  movq    %rsp, %rsi           # rsi will get the address of rsp
-  movq    $endIndex, %rdi      # get the format into rdi
+
+# scan the second index #
+  subq    $4, %rsp             # increase the stack for the input
+  movq    %rsp, %rsi           # store the address of the stack into rsi
+  movq    $endIndex, %rdi      # store the %d into rdi
   movq    $0, %rax
-  call    scanf                # call scanf with format and place for int
-  movzbq  (%rsp), %r15         # put only the first byte of the int in r15b
-  addq    $4, %rsp             # rsp back to his place
+  call    scanf                # call scanf
+  movzbq  (%rsp), %r15         # store the first byte of the int in r15b
+  addq    $4, %rsp             # increase back the stack
+
   movq    %r12, %rdi           # pstring1 into rdi
-  movq    %r13, %rsi           # pstring2 into rsi
-  movzbq  %r14b, %rdx          # we put only the last byte into dl->rdx
-  movzbq  %r15b, %rcx          # we put only the last byte into cl->rcx
+  movq    %r13, %rsi           # store the second pstring into rsi
+  movzbq  %r14b, %rdx          # we put only the last byte into rdx
+  movzbq  %r15b, %rcx          # we put only the last byte into rcx
   call    pstrijcmp
-  movq    %rax, %rsi
-  movq    $format54, %rdi
-  movq    $0, %rax
-  call    printf
-  popq    %r12                 # we need to restore r12 for saving him
-  popq    %r13                 # we need to restore r13 for saving him
-  popq    %r14                 # we need to restore r14 for saving him
-  popq    %r15                 # we need to restore r15 for saving him
+  movq    %rax, %rsi           # store the result of pstrijcmp into rsi
+  movq    $opp54outPut, %rdi   # store opp54 fromat into rdi
+  movq    $0, %rax             # set rax to 0
+  call    printf               # call printf
+  popq    %r12                 # pop r12 for cleaning the stack
+  popq    %r13                 # pop r13 for cleaning the stack
+  popq    %r14                 # pop r14 for cleaning the stack
+  popq    %r15                 # pop r15 for cleaning the stack
   ret
 
-.casedef:
+.oppdef:
   movq    $oppInvalid, %rdi
   call    printf
   ret
